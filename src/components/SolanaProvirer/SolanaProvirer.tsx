@@ -1,19 +1,17 @@
-"use client"
+"use client";
 
 import { FC, ReactNode, useMemo } from "react";
 import {
   ConnectionProvider,
   WalletProvider
 } from "@solana/wallet-adapter-react";
-import {
-  PhantomWalletAdapter
-} from "@solana/wallet-adapter-wallets";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const endpoint = "https://api.mainnet-beta.solana.com";
-  const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
+  const endpoint = "https://api.devnet.solana.com";
+
+  const wallets = useMemo(() => [], []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
