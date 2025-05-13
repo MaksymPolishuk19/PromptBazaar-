@@ -1,2 +1,17 @@
-# PromptBazaar-
-PromptBazar is a decentralized marketplace where users can buy and sell high-quality AI prompts for tools like ChatGPT and Midjourney. While prompts hold significant value, there is no dedicated platform that facilitates their trade in a secure and decentralized way.
+
+# Project Title
+
+PromptBazar — AI prompts marketplace
+
+
+## Features
+
+- Phantom Wallet Integration
+- Prompt Access Control
+- Next.js 15
+- Cross platform
+
+
+## Tech Stack
+
+**Client:** Next.js 15, TypeScript, TailwindCSS, @solana/web3.js, @solana/wallet-adapter
