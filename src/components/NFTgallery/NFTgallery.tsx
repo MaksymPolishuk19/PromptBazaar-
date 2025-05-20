@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { Metaplex, Nft } from "@metaplex-foundation/js";
-import { PublicKey, Connection } from "@solana/web3.js";
+import { Connection } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function NFTGallery() {
   const wallet = useWallet();
   const [nfts, setNfts] = useState<Nft[]>([]);
   const [loading, setLoading] = useState(false);
+  const [prompts, setPrompts] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const fetchNFTs = async () => {
@@ -45,6 +46,19 @@ export default function NFTGallery() {
     fetchNFTs();
   }, [wallet.publicKey]);
 
+  const handleShowPrompt = async (mintAddress: string) => {
+    try {
+      const response = await fetch(`/api/getPrompt?mintAddress=${mintAddress}`);
+      if (!response.ok) {
+        throw new Error("Промпт не найден");
+      }
+      const data = await response.json();
+      setPrompts((prev) => ({ ...prev, [mintAddress]: data.prompt }));
+    } catch (error) {
+      console.error("Ошибка при получении промпта:", error);
+    }
+  };
+
   if (!wallet.connected) {
     return <p className="text-gray-600">Сначала подключите Phantom Wallet.</p>;
   }
@@ -71,6 +85,17 @@ export default function NFTGallery() {
           />
           <h3 className="mt-2 text-lg font-semibold">{nft.name}</h3>
           <p className="text-sm text-gray-600">{nft.json?.description || ""}</p>
+          <button
+              onClick={() => handleShowPrompt(nft.address.toBase58())}
+              className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            >
+              Показать промпт
+            </button>
+            {prompts[nft.address.toBase58()] && (
+              <div className="mt-2 p-2 border rounded bg-gray-100">
+                <p className="text-sm text-gray-800">{prompts[nft.address.toBase58()]}</p>
+              </div>
+            )}
         </div>
       ))}
     </div>

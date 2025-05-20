@@ -3,7 +3,7 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { useState } from "react";
-import { Metaplex, irysStorage, walletAdapterIdentity, toMetaplexFile } from "@metaplex-foundation/js";
+import { Metaplex, irysStorage, walletAdapterIdentity } from "@metaplex-foundation/js";
 
 export default function UploadPromptForm() {
   const wallet = useWallet();
@@ -73,6 +73,20 @@ export default function UploadPromptForm() {
       creators: [{ address: wallet.publicKey, share: 100 }],
     });
 
+    await fetch('/api/savePrompt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        mintAddress: nft.address.toBase58(),
+        title,
+        prompt,
+        category,
+        imageUri: uri,
+      }),
+    });
+
     console.log("🎉 NFT создан:", nft);
     setStatus(`✅ NFT создан! Адрес: ${nft.address.toBase58()}`);
   };
@@ -80,21 +94,23 @@ export default function UploadPromptForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-xl mt-8 p-4 border rounded-xl shadow space-y-4"
+      className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg space-y-6"
     >
-      <h2 className="text-xl font-semibold">📝 Загрузить промпт</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+        📝 Загрузить промпт
+      </h2>
 
       <input
         type="text"
         placeholder="Название промпта"
-        className="w-full border p-2 rounded"
+        className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 rounded-lg px-4 py-3 text-gray-700 transition"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
       />
 
       <select
-        className="w-full border p-2 rounded"
+        className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 rounded-lg px-4 py-3 text-gray-700 transition"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
       >
@@ -106,7 +122,7 @@ export default function UploadPromptForm() {
 
       <textarea
         placeholder="Текст промпта"
-        className="w-full border p-2 rounded h-32"
+        className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 rounded-lg px-4 py-3 text-gray-700 resize-none h-36 transition"
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         required
@@ -115,7 +131,7 @@ export default function UploadPromptForm() {
       <input
         type="file"
         accept="image/*"
-        className="w-full border p-2 rounded"
+        className="w-full border border-gray-300 rounded-lg px-4 py-3 cursor-pointer text-gray-600 hover:bg-indigo-50 transition"
         onChange={(e) => {
           if (e.target.files && e.target.files[0]) {
             setImageFile(e.target.files[0]);
@@ -126,12 +142,12 @@ export default function UploadPromptForm() {
 
       <button
         type="submit"
-        className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md transition"
       >
         Загрузить и заминтить
       </button>
 
-      <div className="text-sm text-gray-600">{status}</div>
+      <div className="text-center text-sm text-gray-500 italic">{status}</div>
     </form>
   );
 }
