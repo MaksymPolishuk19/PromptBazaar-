@@ -31,13 +31,13 @@ export default function NFTGallery() {
             const nft = await metaplex.nfts().load({ metadata: item });
             nftData.push(nft);
           } catch (error) {
-            console.error("Ошибка при загрузке NFT:", error);
+            console.error("Error loading NFT:", error);
           }
         }
 
         setNfts(nftData);
       } catch (error) {
-        console.error("Ошибка при получении NFT:", error);
+        console.error("Error fetching NFTs:", error);
       } finally {
         setLoading(false);
       }
@@ -50,25 +50,25 @@ export default function NFTGallery() {
     try {
       const response = await fetch(`/api/getPrompt?mintAddress=${mintAddress}`);
       if (!response.ok) {
-        throw new Error("Промпт не найден");
+        throw new Error("Prompt not found");
       }
       const data = await response.json();
       setPrompts((prev) => ({ ...prev, [mintAddress]: data.prompt }));
     } catch (error) {
-      console.error("Ошибка при получении промпта:", error);
+      console.error("Error fetching prompt:", error);
     }
   };
 
   if (!wallet.connected) {
-    return <p className="text-gray-600">Сначала подключите Phantom Wallet.</p>;
+    return <p className="text-gray-600">Please connect your Phantom Wallet first.</p>;
   }
 
   if (loading) {
-    return <p className="text-gray-600">Загрузка NFT...</p>;
+    return <p className="text-gray-600">Loading NFTs...</p>;
   }
 
   if (nfts.length === 0) {
-    return <p className="text-gray-600">У вас нет NFT.</p>;
+    return <p className="text-gray-600">You dont own any NFTs.</p>;
   }
 
   return (
@@ -86,16 +86,16 @@ export default function NFTGallery() {
           <h3 className="mt-2 text-lg font-semibold">{nft.name}</h3>
           <p className="text-sm text-gray-600">{nft.json?.description || ""}</p>
           <button
-              onClick={() => handleShowPrompt(nft.address.toBase58())}
-              className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-            >
-              Показать промпт
-            </button>
-            {prompts[nft.address.toBase58()] && (
-              <div className="mt-2 p-2 border rounded bg-gray-100">
-                <p className="text-sm text-gray-800">{prompts[nft.address.toBase58()]}</p>
-              </div>
-            )}
+            onClick={() => handleShowPrompt(nft.address.toBase58())}
+            className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          >
+            Show Prompt
+          </button>
+          {prompts[nft.address.toBase58()] && (
+            <div className="mt-2 p-2 border rounded bg-gray-100">
+              <p className="text-sm text-gray-800">{prompts[nft.address.toBase58()]}</p>
+            </div>
+          )}
         </div>
       ))}
     </div>
