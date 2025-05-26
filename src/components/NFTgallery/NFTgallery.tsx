@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Metaplex, Nft } from "@metaplex-foundation/js";
-import { Connection } from "@solana/web3.js";
+import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function NFTGallery() {
@@ -46,18 +46,41 @@ export default function NFTGallery() {
     fetchNFTs();
   }, [wallet.publicKey]);
 
-  const handleShowPrompt = async (mintAddress: string) => {
-    try {
-      const response = await fetch(`/api/getPrompt?mintAddress=${mintAddress}`);
-      if (!response.ok) {
-        throw new Error("Prompt not found");
-      }
-      const data = await response.json();
-      setPrompts((prev) => ({ ...prev, [mintAddress]: data.prompt }));
-    } catch (error) {
-      console.error("Error fetching prompt:", error);
+const handleShowPrompt = async (mintAddress: string) => {
+
+  if (!wallet.publicKey) {
+    alert("Connect wallet first");
+    return;
+  }
+
+  try {
+    const connection = new Connection("https://api.devnet.solana.com");
+
+    const recipientPubkey = new PublicKey("969AsGFCHevB5EzYmuoDfwMPn6Xo4gnkDiFUPMZzv3qs");
+    const lamports = 0.01 * LAMPORTS_PER_SOL;
+
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: wallet.publicKey,
+        toPubkey: recipientPubkey,
+        lamports,
+      })
+    );
+
+    const signature = await wallet.sendTransaction(transaction, connection);
+    await connection.confirmTransaction(signature, "processed");
+
+    const response = await fetch(`/api/getPrompt?mintAddress=${mintAddress}`);
+    if (!response.ok) {
+      throw new Error("Prompt not found");
     }
-  };
+
+    const data = await response.json();
+    setPrompts((prev) => ({ ...prev, [mintAddress]: data.prompt }));
+  } catch (error) {
+    console.error("Error", error);
+  }
+};
 
   if (!wallet.connected) {
     return <p className="text-gray-600">Please connect your Phantom Wallet first.</p>;
