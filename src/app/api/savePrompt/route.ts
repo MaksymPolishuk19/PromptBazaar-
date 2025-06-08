@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
       const data = await fs.readFile(promptsFilePath, 'utf8');
       prompts = JSON.parse(data);
     } catch (err) {
+      console.log(err);
       prompts = [];
     }
 

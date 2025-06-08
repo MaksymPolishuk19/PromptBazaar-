@@ -4,6 +4,14 @@ import path from 'path';
 
 const promptsFilePath = path.join(process.cwd(), 'data', 'prompts.json');
 
+interface Prompt {
+  mintAddress: string;
+  title: string;
+  prompt: string;
+  category: string;
+  imageUri: string;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const mintAddress = searchParams.get('mintAddress');
@@ -14,8 +22,10 @@ export async function GET(request: NextRequest) {
 
   try {
     const data = await fs.readFile(promptsFilePath, 'utf8');
-    const prompts = JSON.parse(data);
-    const promptEntry = prompts.find((p: any) => p.mintAddress === mintAddress);
+    const prompts: Prompt[] = JSON.parse(data);
+    console.log(prompts);
+    
+    const promptEntry = prompts.find((p) => p.mintAddress === mintAddress);
 
     if (!promptEntry) {
       return NextResponse.json({ message: 'Промпт не найден' }, { status: 404 });

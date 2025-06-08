@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { Metaplex, Nft } from "@metaplex-foundation/js";
+import { Metadata, Metaplex, Nft } from "@metaplex-foundation/js";
 import { Connection, LAMPORTS_PER_SOL, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -28,8 +28,8 @@ export default function NFTGallery() {
 
         for (const item of nftList) {
           try {
-            const nft = await metaplex.nfts().load({ metadata: item });
-            nftData.push(nft);
+            const nft = await metaplex.nfts().load({ metadata: item as Metadata});
+            nftData.push(nft as Nft);
           } catch (error) {
             console.error("Error loading NFT:", error);
           }
